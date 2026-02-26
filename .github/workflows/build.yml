@@ -1,0 +1,29 @@
+name: build
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - stable/**
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+      pull-requests: write
+    steps:
+      - uses: vexxhost/docker-atmosphere/.github/actions/checkout@main
+        with:
+          repository: openstack/senlin
+          ref: 22fd77946723e25e595676e61893c1f645709b2f # stable/2023.1
+
+      - uses: vexxhost/docker-atmosphere/.github/actions/build-image@main
+        with:
+          image-name: senlin
+          build-contexts: senlin=openstack/senlin
+          push: ${{ github.event_name != 'pull_request' }}
